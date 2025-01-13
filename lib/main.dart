@@ -39,9 +39,36 @@ class _ExpenseTrackerState extends State<ExpenseTracker> {
   double needBudget = 25000;
   double wantBudget = 15000;
   double savingBudget = 10000;
-  double spentInNeeds = 1500;
-  double spentInWants = 3500;
-  double savedAmount = 5000;
+ 
+
+  Map<String, List<Map<String, String>>> transactions = {
+    "Needs": [
+      {"name": "Manoj Kumar", "amount": "₹459.00", "date": "Today, 14:40"},
+      {"name": "Manoj Kumar", "amount": "₹459.00", "date": "Today, 14:40"},
+      {"name": "Electricity", "amount": "₹1500.00", "date": "Yesterday"},
+      {"name": "Water", "amount": "₹500.00", "date": "2 days ago"},
+      {"name": "Monthly Rent", "amount": "₹13500.00", "date": "1st Jan"},
+    ],
+    "Wants": [
+      {"name": "Dinner", "amount": "₹1200.00", "date": "Last Week"},
+      {"name": "Lunch", "amount": "₹800.00", "date": "2 Weeks Ago"},
+      {"name": "Game Purchase", "amount": "₹2500.00", "date": "Last Month"},
+    ],
+    "Savings": [
+      {"name": "Deposit", "amount": "₹5000.00", "date": "Last Month"},
+    ],
+    "Unknown": [
+      {"name": "Laptop repair", "amount": "₹1000.00", "date": "10th January 2025"},
+      {"name": "Gift for a friend", "amount": "₹500.00", "date": "5th January 2025"},
+      {"name": "Late payment fee", "amount": "₹200.00", "date": "8th January 2025"},
+    ],
+  };
+
+  double _calculateCategoryTotal(String category) {
+    return transactions[category]?.fold(
+        0.0, (sum, item) => sum! + (double.parse(item['amount']!.replaceAll('₹', '')))) ??
+        0.0;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,22 +79,23 @@ class _ExpenseTrackerState extends State<ExpenseTracker> {
     switch (selectedCategory) {
       case "Needs":
         selectedPercentage = 0.5; // 50% for Needs
-        spentAmount = spentInNeeds;
+        spentAmount = _calculateCategoryTotal("Needs");
         progressLabel = "Spent ₹${spentAmount.toInt()} of ₹${needBudget.toInt()}";
         break;
       case "Wants":
         selectedPercentage = 0.3; // 30% for Wants
-        spentAmount = spentInWants;
+        spentAmount = _calculateCategoryTotal("Wants");
         progressLabel = "Spent ₹${spentAmount.toInt()} of ₹${wantBudget.toInt()}";
         break;
       case "Savings":
         selectedPercentage = 0.2; // 20% for Savings
-        spentAmount = savedAmount;
+        spentAmount = _calculateCategoryTotal("Savings");
         progressLabel = "Saved ₹${spentAmount.toInt()} of ₹${savingBudget.toInt()}";
         break;
       case "Unknown":
         selectedPercentage = 0.0; // No specific percentage
-        progressLabel = "Categorize your transactions!";
+        spentAmount = _calculateCategoryTotal("Unknown");
+        progressLabel = "Saved ₹${spentAmount.toInt()} of ₹${savingBudget.toInt()}";
         break;
     }
 
@@ -83,8 +111,8 @@ class _ExpenseTrackerState extends State<ExpenseTracker> {
           const SizedBox(height: 20),
           // Donut Chart
           CircularPercentIndicator(
-            radius: 100.0,
-            lineWidth: 13.0,
+            radius: 85.0,
+            lineWidth: 30.0,
             animation: true,
             percent: selectedPercentage,
             center: Column(
@@ -116,8 +144,7 @@ class _ExpenseTrackerState extends State<ExpenseTracker> {
               style: const TextStyle(
                 fontSize: 14.0,
                 color: Colors.grey,
-              ),
-            ),
+              )),
           ),
           const SizedBox(height: 20),
           // Category Buttons

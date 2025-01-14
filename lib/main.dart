@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
+import 'app_theme.dart'; // Ensure this import is added
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ScreenUtilInit(
+      designSize: Size(375, 812), // Set the design size (optional)
+      builder: (context, child) => const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -13,6 +20,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      theme: ThemeData.light(), // Use the light theme
+      darkTheme: ThemeData.dark(), // Use the dark theme
+      themeMode: ThemeMode.system, // Follow the system theme mode (Light/Dark)
       home: ExpenseTracker(),
     );
   }
@@ -39,7 +49,6 @@ class _ExpenseTrackerState extends State<ExpenseTracker> {
   double needBudget = 25000;
   double wantBudget = 15000;
   double savingBudget = 10000;
- 
 
   Map<String, List<Map<String, String>>> transactions = {
     "Needs": [
@@ -66,7 +75,7 @@ class _ExpenseTrackerState extends State<ExpenseTracker> {
 
   double _calculateCategoryTotal(String category) {
     return transactions[category]?.fold(
-        0.0, (sum, item) => sum! + (double.parse(item['amount']!.replaceAll('₹', '')))) ??
+            0.0, (sum, item) => sum! + (double.parse(item['amount']!.replaceAll('₹', '')))) ??
         0.0;
   }
 
@@ -100,9 +109,9 @@ class _ExpenseTrackerState extends State<ExpenseTracker> {
     }
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor, // Use theme background color
       appBar: AppBar(
-        backgroundColor: Colors.green,
+        backgroundColor: Theme.of(context).primaryColor, // Use theme primary color
         title: const Text("Spending Habits"),
         centerTitle: true,
       ),
@@ -111,8 +120,8 @@ class _ExpenseTrackerState extends State<ExpenseTracker> {
           const SizedBox(height: 20),
           // Donut Chart
           CircularPercentIndicator(
-            radius: 85.0,
-            lineWidth: 30.0,
+            radius: 85.0.r,
+            lineWidth: 30.0.w,
             animation: true,
             percent: selectedPercentage,
             center: Column(
@@ -132,19 +141,20 @@ class _ExpenseTrackerState extends State<ExpenseTracker> {
               ],
             ),
             circularStrokeCap: CircularStrokeCap.round,
-            progressColor: Colors.orange,
+            progressColor: Theme.of(context).colorScheme.secondary, // Use theme secondary color
           ),
           const SizedBox(height: 10),
           // Budget Division Label
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            padding: EdgeInsets.symmetric(horizontal: 20.0.w),
             child: Text(
               "Your monthly budget is divided amongst Needs (50%), Wants (30%), and Savings (20%) of your monthly income respectively.",
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 14.0,
-                color: Colors.grey,
-              )),
+              style: TextStyle(
+                fontSize: 14.0.sp,
+                color: Theme.of(context).textTheme.bodyMedium?.color, // Use theme text color
+              ),
+            ),
           ),
           const SizedBox(height: 20),
           // Category Buttons
@@ -160,9 +170,9 @@ class _ExpenseTrackerState extends State<ExpenseTracker> {
           const SizedBox(height: 20),
           // Progress Bar
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            padding: EdgeInsets.symmetric(horizontal: 20.0.w),
             child: LinearPercentIndicator(
-              lineHeight: 20.0,
+              lineHeight: 20.0.h,
               animation: true,
               percent: spentAmount /
                   (selectedCategory == "Needs"
@@ -178,7 +188,7 @@ class _ExpenseTrackerState extends State<ExpenseTracker> {
                 ),
               ),
               linearStrokeCap: LinearStrokeCap.roundAll,
-              progressColor: Colors.orange,
+              progressColor: Theme.of(context).colorScheme.secondary, // Use theme secondary color
               backgroundColor: Colors.grey[300],
             ),
           ),
@@ -278,8 +288,9 @@ class _ExpenseTrackerState extends State<ExpenseTracker> {
         });
       },
       style: ElevatedButton.styleFrom(
-        backgroundColor:
-            selectedCategory == category ? Colors.green : Colors.grey[300],
+        backgroundColor: selectedCategory == category
+            ? Theme.of(context).primaryColor
+            : Colors.grey[300],
       ),
       child: Text(
         category,
@@ -304,9 +315,9 @@ class _ExpenseTrackerState extends State<ExpenseTracker> {
           child: Stack(
             children: [
               Container(
-                height: 150,
+                height: 150.h,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(10.r),
                   image: DecorationImage(
                     image: AssetImage(imagePath),
                     fit: BoxFit.cover,
@@ -314,9 +325,9 @@ class _ExpenseTrackerState extends State<ExpenseTracker> {
                 ),
               ),
               Container(
-                height: 150,
+                height: 150.h,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(10.r),
                   gradient: LinearGradient(
                     colors: [Colors.black.withOpacity(0.6), Colors.transparent],
                     begin: Alignment.bottomCenter,
@@ -325,20 +336,20 @@ class _ExpenseTrackerState extends State<ExpenseTracker> {
                 ),
               ),
               Positioned(
-                bottom: 10,
-                left: 10,
+                bottom: 10.h,
+                left: 10.w,
                 child: Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
-                    fontSize: 18,
+                    fontSize: 18.sp,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
               Positioned(
-                bottom: 10,
-                right: 10,
+                bottom: 10.h,
+                right: 10.w,
                 child: Icon(
                   isDropdownOpen[title] ?? false
                       ? Icons.keyboard_arrow_up
@@ -351,7 +362,7 @@ class _ExpenseTrackerState extends State<ExpenseTracker> {
         ),
         if (isDropdownOpen[title] ?? false)
           Padding(
-            padding: const EdgeInsets.all(10.0),
+            padding: EdgeInsets.all(10.0.w),
             child: Column(
               children: transactions,
             ),
@@ -365,14 +376,21 @@ class _ExpenseTrackerState extends State<ExpenseTracker> {
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: Colors.green,
-          child: Icon(Icons.person, color: Colors.white),
+          child: Icon(Icons.person, color: Colors.white, size: 24.sp),
         ),
-        title: Text(name),
-        subtitle: Text(date),
+        title: Text(
+          name,
+          style: TextStyle(fontSize: 14.sp),
+        ),
+        subtitle: Text(
+          date,
+          style: TextStyle(fontSize: 12.sp, color: Colors.grey),
+        ),
         trailing: Text(
           amount,
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.bold,
+            fontSize: 14.sp,
           ),
         ),
       ),
